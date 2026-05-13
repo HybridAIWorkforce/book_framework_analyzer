@@ -1,0 +1,37 @@
+generator client {
+    provider = "prisma-client-js"
+    binaryTargets = ["native", "linux-musl-arm64-openssl-3.0.x"]
+    output = "/home/ubuntu/book_framework_analyzer/nextjs_space/node_modules/.prisma/client"
+}
+
+datasource db {
+    provider = "postgresql"
+    url      = env("DATABASE_URL")
+}
+
+model User {
+  id             String     @id @default(cuid())
+  name           String?
+  email          String     @unique
+  hashedPassword String
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
+  analyses       Analysis[]
+}
+
+model Analysis {
+  id                String   @id @default(cuid())
+  filename          String
+  cloudStoragePath  String
+  originalStructure Json?
+  suggestions       Json?
+  frameworkMatch    String?
+  notes             String?  @db.Text
+  status            String   @default("pending")
+  userId            String?
+  user              User?    @relation(fields: [userId], references: [id])
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@index([userId])
+}
